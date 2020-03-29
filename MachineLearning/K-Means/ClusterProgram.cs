@@ -45,14 +45,47 @@ namespace K_Means
 
         static void ShowData(double[][] data, int decimals, bool indices, bool newLine)
         {
+            for (int i = 0; i < data.Length; ++i)
+            {
+                if (indices == true)
+                    Console.Write(i.ToString().PadLeft(3) + " ");
+                for (int j = 0; j < data[i].Length; ++j)
+                {
+                    double v = data[i][j];
+                    Console.Write(v.ToString("F" + decimals) + " ");
+                }
+                Console.WriteLine("");
+            }
+            if (newLine == true)
+                Console.WriteLine("");
         }
 
         static void ShowVector(int[] vector, bool newLine)
         {
+            for (int i = 0; i < vector.Length; ++i)
+                Console.Write(vector[i] + " ");
+            if (newLine == true) Console.WriteLine("\n");
         }
 
         static void ShowClustered(double[][] data, int[] clustering, int numClusters, int decimals)
         {
+            for (int k = 0; k < numClusters; ++k)
+            {
+                Console.WriteLine("===================");
+                for (int i = 0; i < data.Length; ++i)
+                {
+                    int clusterID = clustering[i];
+                    if (clusterID != k) continue;
+                    Console.Write(i.ToString().PadLeft(3) + " ");
+                    for (int j = 0; j < data[i].Length; ++j)
+                    {
+                        double v = data[i][j];
+                        Console.Write(v.ToString("F" + decimals) + " ");
+                    }
+                    Console.WriteLine("");
+                }
+                Console.WriteLine("===================");
+            } // k
         }
     }
 
