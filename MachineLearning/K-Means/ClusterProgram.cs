@@ -112,13 +112,151 @@ namespace K_Means
 
     public class Clusterer
     {
+        private int numClusters;
+        private int[] clustering;
+        private double[][] centroids;
+        private Random rnd;
+
         public Clusterer(int numClusters)
         {
+            this.numClusters = numClusters;
+            this.centroids = new double[numClusters][];
+            this.rnd = new Random(0);
         }
 
         public int[] Cluster(double[][] data)
         {
-            throw new NotImplementedException();
+            int numTuples = data.Length;
+            int numValues = data[0].Length;
+            this.clustering = new int[numTuples];
+
+            for (int k = 0; k < numClusters; ++k)
+                this.centroids[k] = new double[numValues];
+
+            InitRandom(data);
+
+            Console.WriteLine("\nInitial random clustering:");
+            for (int i = 0; i < clustering.Length; ++i)
+                Console.Write(clustering[i] + " ");
+            Console.WriteLine("\n");
+
+            bool changed = true; // change in clustering?
+            int maxCount = numTuples * 10; // sanity check
+            int ct = 0;
+            while (changed == true && ct < maxCount)
+            {
+                ++ct;
+                UpdateCentroids(data);
+                changed = UpdateClustering(data);
+            }
+
+            int[] result = new int[numTuples];
+            Array.Copy(this.clustering, result, clustering.Length);
+            return result;
+        }
+
+        private void InitRandom(double[][] data)
+        {
+            int numTuples = data.Length;
+            int clusterID = 0;
+            for (int i = 0; i < numTuples; ++i)
+            {
+                clustering[i] = clusterID++;
+                if (clusterID == numClusters)
+                    clusterID = 0;
+            }
+
+            for (int i = 0; i < numTuples; ++i)
+            {
+                int r = rnd.Next(i, clustering.Length); // pick a cell
+                int tmp = clustering[r]; // get the cell value
+                clustering[r] = clustering[i]; // swap values
+                clustering[i] = tmp;
+            }
+        } // InitRandom
+
+        private void UpdateCentroids(double[][] data)
+        {
+            int[] clusterCounts = new int[numClusters];
+            for (int i = 0; i < data.Length; ++i)
+            {
+                int clusterID = clustering[i];
+                ++clusterCounts[clusterID];
+            }
+
+            for (int k = 0; k < centroids.Length; ++k)
+                for (int j = 0; j < centroids[k].Length; ++j)
+                    centroids[k][j] = 0.0;
+
+            for (int i = 0; i < data.Length; ++i)
+            {
+                int clusterID = clustering[i];
+                for (int j = 0; j < data[i].Length; ++j)
+                    centroids[clusterID][j] += data[i][j]; // accumulate sum
+            }
+
+            for (int k = 0; k < centroids.Length; ++k)
+                for (int j = 0; j < centroids[k].Length; ++j)
+                    centroids[k][j] /= clusterCounts[k]; // danger?
+        } // UpdateCentroids
+
+        private bool UpdateClustering(double[][] data)
+        {
+            bool changed = false;
+            int[] newClustering = new int[clustering.Length];
+            Array.Copy(clustering, newClustering, clustering.Length);
+            double[] distances = new double[numClusters];
+
+            for (int i = 0; i < data.Length; ++i) // each tuple
+            {
+                for (int k = 0; k < numClusters; ++k)
+                    distances[k] = Distance(data[i], centroids[k]);
+                int newClusterID = MinIndex(distances); // closest centroid
+                if (newClusterID != newClustering[i])
+                {
+                    changed = true; // note a new clustering
+                    newClustering[i] = newClusterID; // accept update
+                }
+            }
+
+            if (changed == false)
+                return false;
+
+            int[] clusterCounts = new int[numClusters];
+            for (int i = 0; i < data.Length; ++i)
+            {
+                int clusterID = newClustering[i];
+                ++clusterCounts[clusterID];
+            }
+            for (int k = 0; k < numClusters; ++k)
+                if (clusterCounts[k] == 0)
+                    return false; // bad proposed clustering
+
+            Array.Copy(newClustering, this.clustering, newClustering.Length);
+            return true;
+        } // UpdateClustering
+
+        private static double Distance(double[] tuple, double[] centroid)
+        {
+            double sumSquaredDiffs = 0.0;
+            for (int j = 0; j < tuple.Length; ++j)
+                sumSquaredDiffs += (tuple[j] - centroid[j]) * (tuple[j] - centroid[j]);
+            return Math.Sqrt(sumSquaredDiffs);
+        }
+
+        private static int MinIndex(double[] distances)
+        {
+            int indexOfMin = 0;
+            double smallDist = distances[0];
+            for (int k = 1; k < distances.Length; ++k)
+            {
+                if (distances[k] < smallDist)
+                {
+                    smallDist = distances[k];
+                    indexOfMin = k;
+                }
+            }
+            return indexOfMin;
         }
     }
 }
