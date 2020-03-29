@@ -9,10 +9,16 @@ namespace K_Means
             Console.WriteLine("\nBegin k-means clustering demo\n");
 
             double[][] rawData = new double[10][];
-            rawData[0] = new double[] { 73, 72.6 };
-            rawData[1] = new double[] { 61, 54.4 };
-            // etc.
-            rawData[9] = new double[] { 61, 59.0 };
+            rawData[0] = new double[] { 73.0, 72.6 };
+            rawData[1] = new double[] { 61.0, 54.4 };
+            rawData[2] = new double[] { 67.0, 99.9 };
+            rawData[3] = new double[] { 68.0, 97.3 };
+            rawData[4] = new double[] { 62.0, 59.0 };
+            rawData[5] = new double[] { 75.0, 81.6 };
+            rawData[6] = new double[] { 74.0, 77.1 };
+            rawData[7] = new double[] { 66.0, 97.3 };
+            rawData[8] = new double[] { 68.0, 93.3 };
+            rawData[9] = new double[] { 61.0, 59.0 };
 
             Console.WriteLine("Raw unclustered data:\n");
             Console.WriteLine(" ID Height (in.) Weight (kg.)");
