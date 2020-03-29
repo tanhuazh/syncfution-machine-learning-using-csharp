@@ -87,6 +87,27 @@ namespace K_Means
                 Console.WriteLine("===================");
             } // k
         }
+
+        static double[][] LoadData(string dataFile, int numRows, int numCols, char delimit)
+        {
+            System.IO.FileStream ifs = new System.IO.FileStream(dataFile, System.IO.FileMode.Open);
+            System.IO.StreamReader sr = new System.IO.StreamReader(ifs);
+            string line = "";
+            string[] tokens = null;
+            int i = 0;
+            double[][] result = new double[numRows][];
+            while ((line = sr.ReadLine()) != null)
+            {
+                result[i] = new double[numCols];
+                tokens = line.Split(delimit);
+                for (int j = 0; j < numCols; ++j)
+                    result[i][j] = double.Parse(tokens[j]);
+                ++i;
+            }
+            sr.Close();
+            ifs.Close();
+            return result;
+        }
     }
 
     public class Clusterer
